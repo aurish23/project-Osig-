@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f1e8">
+<title>SIGAP Semarang v13.6.7 - GitHub FINAL</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./style.css?v=1367">
+</head>
+<body>
+<!-- Splash + onboarding, benar-benar berada di dalam WebGIS -->
+<div id="welcomeFlow" class="welcome-flow">
+<button id="audioToggle" class="intro-audio-toggle" type="button" title="Suara introduction" aria-label="Aktifkan atau matikan suara">🔇</button>
+<section id="splashScreen" class="splash-screen sigap-hero-splash">
+      <div class="hero-image-wrap" aria-hidden="true">
+        <img src="./sigap-semarang-rescue-bg.png" class="hero-semarang-image" alt="">
+        <div class="hero-image-shade"></div>
+      </div>
+
+      <div class="hero-topbar">
+        <div class="hero-brand">
+          <div class="hero-brand-mark">S</div>
+          <div><strong>SIGAP</strong><span>WebGIS Aksesibilitas Layanan Darurat<br>Kota Semarang</span></div>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <div class="hero-kicker">BERSAMA MEMBANGUN KOTA YANG TANGGUH</div>
+        <h1>Semarang<br><em>Siap, Selamat, Bersama</em></h1>
+        <p>SIGAP membantu Anda menemukan layanan darurat dengan lebih cepat, tepat, dan mudah di Kota Semarang.</p>
+        <button id="enterOnboarding" class="primary-cta hero-next">Mulai Jelajah <span>→</span></button>
+      </div>
+
+      <div class="hero-audio"></div>
+    </section>
+
+  <section id="onboardingScreen" class="onboarding-screen hidden">
+      <div class="onboarding-shared-bg" aria-hidden="true">
+        <img src="./sigap-semarang-rescue-bg.png" alt="">
+        <div class="onboarding-bg-overlay"></div>
+      </div>
+
+    <button id="skipOnboarding" class="skip-btn">Lewati intro</button>
+    <div class="onboard-shell onboard-shell-v2">
+      <div class="onboard-brand"><span class="brand-mini">⌖</span><div><b>SIGAP</b><small>Tur singkat fitur WebGIS</small></div></div>
+      <div class="onboard-stage">
+        <article class="onboard-slide active" data-slide="0">
+          <div class="onboard-visual ui-demo-v2">
+            <div class="demo-window">
+              <div class="demo-toolbar"><b>Peta SIGAP</b><span class="demo-live">● Aktif</span></div>
+              <div class="demo-search">⌕ Cari fasilitas, alamat, atau kecamatan…</div>
+              <div class="demo-map">
+                <span class="demo-road dr1"></span><span class="demo-road dr2"></span><span class="demo-road dr3"></span>
+                <span class="demo-marker med" style="left:63%;top:24%">+</span>
+                <span class="demo-marker police" style="left:30%;top:42%">◆</span>
+                <span class="demo-marker fire" style="left:72%;top:58%">●</span>
+                <span class="demo-user" style="left:48%;top:62%">⌖</span>
+                <div class="demo-nearest"><small>TERDEKAT</small><b>RS Nasional Diponegoro</b><span>1,8 km · 4 menit</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="onboard-copy"><span class="eyebrow">01 · TEMUKAN</span><h2>Temukan layanan terdekat dari lokasi Anda</h2><p>SIGAP menampilkan fasilitas medis, kepolisian, kebakaran, dan kebencanaan dalam satu peta interaktif dengan pencarian berbasis lokasi.</p><div class="onboard-chips"><span>⌖ Nearest facility</span><span>4 kategori layanan</span><span>Pencarian lokasi</span></div></div>
+        </article>
+
+        <article class="onboard-slide" data-slide="1">
+          <div class="onboard-visual ui-demo-v2">
+            <div class="demo-window">
+              <div class="demo-toolbar"><b>Rute ke Fasilitas</b><span>Tujuan aktif</span></div>
+              <div class="demo-map route-map">
+                <span class="demo-road dr1"></span><span class="demo-road dr2"></span>
+                <svg class="demo-route-svg" viewBox="0 0 400 190" preserveAspectRatio="none"><path d="M55,145 C95,115 120,130 155,92 S225,72 260,55 S320,45 348,30" fill="none" stroke="#C83E3E" stroke-width="7" stroke-linecap="round"/></svg>
+                <span class="demo-user" style="left:11%;top:68%">A</span><span class="demo-marker med" style="left:84%;top:10%">+</span>
+              </div>
+              <div class="demo-route-panel"><div class="demo-mode active">🚗 Mobil</div><div class="demo-mode">🏍 Motor</div><div class="demo-metric"><b>6,4 km</b><small>Jarak</small></div><div class="demo-metric"><b>11 mnt</b><small>Estimasi</small></div></div>
+            </div>
+          </div>
+          <div class="onboard-copy"><span class="eyebrow">02 · RUTE</span><h2>Bandingkan rute mobil dan motor</h2><p>Jalur dihitung melalui jaringan jalan sehingga pengguna memperoleh jarak perjalanan dan estimasi waktu menuju fasilitas yang dipilih.</p><div class="onboard-chips"><span>🚗 Mobil</span><span>🏍 Motor</span><span>Jaringan jalan</span></div></div>
+        </article>
+
+        <article class="onboard-slide" data-slide="2">
+          <div class="onboard-visual ui-demo-v2">
+            <div class="demo-window">
+              <div class="demo-toolbar"><b>Analisis Cakupan</b><span>Kota Semarang</span></div>
+              <div class="demo-map coverage-map">
+                <span class="demo-road dr1"></span><span class="demo-road dr3"></span>
+                <span class="demo-iso iso-a"></span><span class="demo-iso iso-b"></span><span class="demo-iso iso-c"></span>
+                <span class="demo-marker med" style="left:49%;top:41%">+</span>
+              </div>
+              <div class="demo-legend"><span><i class="g"></i>0–5 menit</span><span><i class="o"></i>5–10 menit</span><span><i class="r"></i>10–15 menit</span></div>
+            </div>
+          </div>
+          <div class="onboard-copy"><span class="eyebrow">03 · ANALISIS</span><h2>Lihat wilayah yang cepat dan lambat terjangkau</h2><p>Service area 5, 10, dan 15 menit membantu membaca aksesibilitas layanan darurat dan menjadi dasar analisis spasial Kota Semarang.</p><div class="onboard-chips"><span>Service area</span><span>Analisis kategori</span><span>Aksesibilitas</span></div></div>
+        </article>
+      </div>
+      <div class="onboard-footer"><div><small class="onboard-progress-label">PANDUAN FITUR</small><div id="onboardDots" class="dots"><button class="active"></button><button></button><button></button></div></div><button id="nextOnboarding" class="primary-cta">Lanjut <span>→</span></button></div>
+    </div>
+  </section>
+</div>
+
+<div id="app">
+<header class="topbar">
+  <div class="brand-wrap"><div class="brand-mark">⌖</div><div><b>SIGAP</b><small>WebGIS Aksesibilitas Layanan Darurat · Kota Semarang</small></div></div>
+  <nav class="main-nav">
+    <button class="nav-btn active" data-nav="home">⌂ <span>Beranda</span></button>
+    <button class="nav-btn" data-nav="map">▦ <span>Peta</span></button>
+    <button class="nav-btn" data-nav="analysis">▥ <span>Analisis</span></button>
+    <button class="nav-btn" data-nav="about">ⓘ <span>Tentang</span></button>
+    <button class="nav-btn" data-nav="guide">? <span>Panduan</span></button>
+  </nav>
+  <div class="top-actions">
+  <div class="live-chip"><span></span><div><small>Sistem</small><b>Aktif</b></div></div>
+  <button id="accidentBtn" class="incident-top-btn">🚨 <span>Simulasi Kecelakaan</span></button>
+  <button id="locBtn" class="loc-btn">⌖ <span>Lokasi Saya</span></button>
+</div>
+</header>
+
+<main class="layout">
+<aside class="panel">
+  <div class="panel-intro"><span class="eyebrow">LAYANAN DARURAT</span><h2>Siap membantu Anda menemukan layanan.</h2><p>Pilih kategori untuk menampilkan fasilitas, rute, dan analisis jangkauan waktu.</p></div>
+
+  <div class="filters">
+    <button class="filter active" data-cat="Semua"><span class="filter-icon all">⌘</span><span><b>Semua</b><small>Seluruh layanan</small></span></button>
+    <button class="filter" data-cat="Medis"><span class="filter-icon medical">✚</span><span><b>Medis</b><small>RS & Puskesmas</small></span></button>
+    <button class="filter" data-cat="Keamanan"><span class="filter-icon security">◆</span><span><b>Keamanan</b><small>Kepolisian</small></span></button>
+    <button class="filter" data-cat="Bencana"><span class="filter-icon disaster">▲</span><span><b>Bencana</b><small>BPBD & SAR</small></span></button>
+    <button class="filter" data-cat="Kebakaran"><span class="filter-icon fire">●</span><span><b>Kebakaran</b><small>Pos Damkar</small></span></button>
+    
+  </div>
+
+  <div class="section-label"><span>Analisis & Visualisasi</span><i></i></div>
+  <div class="analysisbox">
+    <div class="analysis-title"><div><span class="analysis-icon">◫</span><b>Batas Administrasi</b></div><label class="switch"><input id="boundaryToggle" type="checkbox" checked><span></span></label></div>
+    <p id="boundaryStatus">Memuat batas administrasi…</p>
+    <div class="legend"><span><i class="l5"></i>0–5 menit</span><span><i class="l10"></i>5–10 menit</span><span><i class="l15"></i>10–15 menit</span></div>
+  </div>
+
+  <div class="city-analysis">
+    <div class="analysis-title"><div><span class="analysis-icon red">▥</span><b>Analisis Cakupan Kota</b></div></div>
+    <p>Analisis seluruh fasilitas pada kategori aktif berdasarkan waktu tempuh jaringan jalan.</p>
+    <button id="cityCoverageBtn" class="coverage-btn" onclick="analyzeCityCoverage()">Analisis Kategori Aktif <span>→</span></button>
+    <button class="coverage-clear" onclick="clearCityCoverage()">Hapus Analisis</button>
+    <div id="coverageStatus" class="coverage-status">Pilih Medis, Keamanan, Kebakaran, atau Bencana.</div>
+    <div id="coverageStats" class="coverage-stats hidden">
+      <div><strong id="covFacilities">0</strong><span>Fasilitas</span></div><div><strong id="cov5">—</strong><span>≤5 menit</span></div><div><strong id="cov10">—</strong><span>≤10 menit</span></div><div><strong id="cov15">—</strong><span>≤15 menit</span></div>
+    </div>
+  </div>
+
+  <div class="notice success" id="damkarNotice"><span>●</span><div>Memuat pos sektor Damkar Kota Semarang…</div></div>
+  <div class="section-label nearest-head"><span>Fasilitas Terdekat</span><i></i></div>
+  <div id="nearestList" class="nearest"></div>
+</aside>
+
+<section class="mapwrap">
+  <div id="map"></div>
+  <div id="incidentModeBadge" class="incident-mode-badge hidden">
+    <span class="incident-pulse-dot"></span>
+    <div><b>MODE SIMULASI KECELAKAAN</b><small id="incidentBadgeText">Titik korban aktif</small></div>
+  </div>
+  <div class="map-search-card">
+    <span>⌕</span><input id="facilitySearch" type="search" placeholder="Cari nama fasilitas, alamat, atau kecamatan…"><button id="clearSearch" title="Hapus pencarian">×</button>
+  </div>
+  <div class="map-status"><span class="status-dot"></span><b>Kota Semarang</b><small id="mapStatusText">Memuat fasilitas…</small></div>
+  <div class="basemap-card"><button id="basemapBtn">▱ <span>Peta Terang</span>⌄</button><div id="basemapMenu" class="basemap-menu hidden"><button data-base="light" class="active">Peta Terang</button><button data-base="osm">OpenStreetMap</button></div></div>
+  <div class="floating-legend">
+    <div class="legend-title">Legenda</div>
+    <span><i class="legend-dot med"></i>Medis</span><span><i class="legend-dot sec"></i>Keamanan</span><span><i class="legend-dot fir"></i>Kebakaran</span><span><i class="legend-dot dis"></i>Bencana</span>
+  </div>
+
+  <div id="incidentPanel" class="incident-panel hidden">
+    <button id="closeIncidentPanel" class="close">×</button>
+    <div class="incident-panel-head">
+      <span class="incident-icon">🚨</span>
+      <div><small>SIMULASI INSIDEN</small><h3>Kecelakaan Lalu Lintas</h3></div>
+    </div>
+    <div class="victim-location-card">
+      <span class="victim-dot"></span>
+      <div><b>Lokasi Korban</b><small id="victimCoords">-</small></div>
+    </div>
+    <p class="incident-desc">SIGAP mencari fasilitas yang paling dekat dari titik korban untuk mendukung respons awal.</p>
+    <div class="incident-recommendations">
+      <div class="incident-service-card medical">
+        <div class="service-badge">✚</div>
+        <div class="service-copy"><small>MEDIS TERDEKAT</small><b id="nearestMedicalName">Mencari...</b><span id="nearestMedicalDistance">-</span></div>
+        <button id="routeNearestMedical">Rute →</button>
+      </div>
+      <div class="incident-service-card police">
+        <div class="service-badge">◆</div>
+        <div class="service-copy"><small>KEAMANAN TERDEKAT</small><b id="nearestPoliceName">Mencari...</b><span id="nearestPoliceDistance">-</span></div>
+        <button id="routeNearestPolice">Rute →</button>
+      </div>
+    </div>
+    <div class="dispatch-module">
+      <div class="dispatch-module-head">
+        <div><small>SIMULASI RESPONS</small><b>Hitung waktu respons jaringan jalan</b></div>
+        <span>OSRM</span>
+      </div>
+
+      <button id="calculateDispatchBtn" class="calculate-dispatch-btn">
+        <span class="dispatch-btn-icon">▶</span><span>Hitung Simulasi Respons</span>
+      </button>
+
+      <div id="dispatchLoading" class="dispatch-loading hidden">
+        <span class="dispatch-spinner"></span>
+        <div><b>Menghitung rute...</b><small>Medis, kepolisian, dan evakuasi korban.</small></div>
+      </div>
+
+      <div id="dispatchResults" class="dispatch-results hidden">
+        <button class="dispatch-result medical" id="showMedicalDispatch">
+          <div><small>MEDIS → KORBAN</small><b id="dispatchMedicalTime">—</b></div>
+          <span id="dispatchMedicalDistance">—</span>
+        </button>
+        <button class="dispatch-result police" id="showPoliceDispatch">
+          <div><small>POLISI → KORBAN</small><b id="dispatchPoliceTime">—</b></div>
+          <span id="dispatchPoliceDistance">—</span>
+        </button>
+        <button class="dispatch-result evacuation" id="showEvacuationDispatch">
+          <div><small>KORBAN → MEDIS</small><b id="dispatchEvacuationTime">—</b></div>
+          <span id="dispatchEvacuationDistance">—</span>
+        </button>
+        <p id="dispatchStatus">Klik salah satu hasil untuk menampilkan rutenya.</p>
+      </div>
+    </div>
+
+    <div class="incident-actions">
+      <a class="emergency-call" href="tel:112">☎ Hubungi 112</a>
+      <button id="endAccidentSimulation" class="end-simulation">Akhiri Simulasi</button>
+    </div>
+    <small class="simulation-note">Mode simulasi untuk demonstrasi WebGIS. Estimasi waktu adalah waktu perjalanan jaringan jalan, bukan waktu dispatch resmi.</small>
+  </div>
+
+  <div id="routeCard" class="routecard hidden">
+    <button id="closeRoute" class="close">×</button><small class="route-kicker">RUTE KE FASILITAS</small><h3 id="routeTitle">-</h3>
+    <div class="metrics"><span><b id="routeDistance">-</b><small>Jarak jaringan jalan</small></span><span><b id="routeTime">-</b><small>Estimasi</small></span></div>
+    <div class="transport-box"><div class="transport-label">Moda perjalanan</div><div class="transport-options"><button id="modeCar" class="transport-btn active" onclick="setTransportMode('car')">🚗 Mobil</button><button id="modeMotor" class="transport-btn" onclick="setTransportMode('motorcycle')">🏍️ Motor</button></div><small id="transportNote">Mobil: rute mengikuti profil driving OSRM.</small></div>
+    <div class="live-nav-box">
+      <div><small>NAVIGASI LANGSUNG</small><b id="liveNavStatus">Belum aktif</b><span id="liveNavAccuracy">GPS akan diperbarui selama perjalanan.</span></div>
+      <button id="startLiveNav" class="live-nav-start">▶ Mulai Navigasi</button>
+      <button id="stopLiveNav" class="live-nav-stop hidden">■ Hentikan</button>
+    </div>
+    <button id="serviceAreaBtn" class="secondary">Analisis Service Area 5–10–15 menit</button><button id="clearRoute" class="dark-btn">Hapus Rute</button><p id="isoStatus" class="status"></p>
+  </div>
+
+  <div class="map-footer-cards">
+    <div><span class="footer-icon">◴</span><p><b>Respons Cepat</b><small>Informasi lokasi dan rute layanan darurat dalam satu peta.</small></p></div>
+    <div><span class="footer-icon">▥</span><p><b>Perencanaan Terukur</b><small>Analisis jangkauan waktu untuk mendukung pengambilan keputusan.</small></p></div>
+    <div><span class="footer-icon">◎</span><p><b>Kota Lebih Tangguh</b><small>Kolaborasi data untuk keselamatan masyarakat.</small></p></div>
+  </div>
+</section>
+</main>
+</div>
+
+<div id="accidentModal" class="simple-modal hidden">
+  <div class="simple-modal-card accident-setup-card">
+    <button class="modal-close" id="closeAccidentModal">×</button>
+    <span class="eyebrow">SIMULASI TANGGAP DARURAT</span>
+    <h2>Tempatkan titik lokasi korban kecelakaan</h2>
+    <p>Pilih sumber lokasi korban. SIGAP kemudian mencari fasilitas medis dan kepolisian terdekat dari titik tersebut.</p>
+    <div class="accident-choice-grid">
+      <button id="useVictimCurrentLocation" class="accident-choice">
+        <span>⌖</span><b>Gunakan Lokasi Saat Ini</b><small>Posisi browser menjadi lokasi korban</small>
+      </button>
+      <button id="pickVictimOnMap" class="accident-choice">
+        <span>◎</span><b>Pilih Titik di Peta</b><small>Klik lokasi kecelakaan secara manual</small>
+      </button>
+    </div>
+    <div class="simulation-flow">
+      <span>1. Titik korban</span><i>→</i><span>2. Fasilitas terdekat</span><i>→</i><span>3. Rute respons</span>
+    </div>
+  </div>
+</div>
+
+<div id="aboutModal" class="simple-modal hidden"><div class="simple-modal-card"><button class="modal-close" data-close="aboutModal">×</button><span class="eyebrow">TENTANG SIGAP</span><h2>Sistem Informasi Geospasial Aksesibilitas Layanan Darurat</h2><p>SIGAP membantu pengguna melihat fasilitas darurat Kota Semarang, menemukan fasilitas terdekat, menghitung rute mobil atau motor, serta menganalisis jangkauan layanan berdasarkan waktu tempuh jaringan jalan.</p><div class="about-grid"><div><b>4</b><span>Kategori layanan</span></div><div><b>5–15</b><span>Menit service area</span></div><div><b>WebGIS</b><span>Analisis spasial</span></div></div></div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./script.js?v=1367"></script>
+</body></html>
