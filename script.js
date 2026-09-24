@@ -175,7 +175,79 @@ async function geocodeDamkar(d){const cacheKey='sigap_geocode_'+d.id;try{const c
   const u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+encodeURIComponent(q);
   const r=await fetch(u,{headers:{'Accept-Language':'id'}});if(!r.ok)throw Error();const j=await r.json();if(!j.length)throw Error();const out={lat:Number(j[0].lat),lng:Number(j[0].lon)};localStorage.setItem(cacheKey,JSON.stringify(out));return out;
 }
-async function loadDamkar(){const note=document.getElementById('damkarNotice');try{const r=await fetch('./damkar_semarang.json', {cache:'no-store'});const arr=await r.json();let ok=0,failed=0;for(const d of arr){let lat=d.lat,lng=d.lng;if(lat==null||lng==null){try{const g=await geocodeDamkar(d);lat=g.lat;lng=g.lng;await sleep(1100)}catch(e){failed++;continue}}features.push(toFeature(d,lat,lng));ok++;}renderMarkers();note.textContent=`🔥 ${ok} pos Damkar aktif di peta${failed?`; ${failed} titik belum memiliki koordinat`:''}.`;note.classList.add('success')}catch(e){note.textContent='🔥 Data Damkar belum dapat dimuat; kategori lain tetap dapat digunakan.'}}
+async function loadDamkar(){
+  const note=document.getElementById('damkarNotice');
+
+  try{
+    const r=await fetch(
+      `${SUPABASE_URL}/rest/v1/damkar?select=*`,
+      {
+        headers:{
+          apikey:SUPABASE_KEY,
+          Authorization:`Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if(!r.ok) throw Error(`Supabase error: ${r.status}`);
+
+    const arr=await r.json();
+
+    let ok=0;
+    let failed=0;
+
+    for(const d of arr){
+      let lat=d.latitude;
+      let lng=d.longitude;
+
+      if(lat==null || lng==null){
+        try{
+          const g=await geocodeDamkar({
+            id:d.id,
+            nama:d.nama,
+            alamat:d.alamat_resmi
+          });
+
+          lat=g.lat;
+          lng=g.lng;
+
+          await sleep(1100);
+        }catch(e){
+          failed++;
+          continue;
+        }
+      }
+
+      features.push(
+        toFeature(
+          {
+            id:d.id,
+            nama:d.nama,
+            jenis:'Pos Damkar',
+            alamat:d.alamat_resmi,
+            kecamatan:d.wilayah,
+            telepon:d.telepon
+          },
+          lat,
+          lng
+        )
+      );
+
+      ok++;
+    }
+
+    renderMarkers();
+
+    note.textContent=
+      `🔥 ${ok} pos Damkar aktif di peta${failed ? `; ${failed} titik belum memiliki koordinat` : ''}.`;
+
+    note.classList.add('success');
+
+  }catch(e){
+    console.error(e);
+    note.textContent='🔥 Data Damkar gagal dimuat dari Supabase.';
+  }
+}
 
 (async()=>{
   try{
