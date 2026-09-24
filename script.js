@@ -5,7 +5,8 @@ const baseLayers={
 };
 let activeBase=baseLayers.light.addTo(map);
 let features=[],markers=[],activeCat='Semua',userLatLng=null,userMarker=null,routeLayer=null,selected=null,boundaryLayer=null,isoLayer=null;
-
+const SUPABASE_URL = 'https://jivxohjycfwgwfobcbvt.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_do6jbDfeRdy-LpLFtGcblQ_eX9qEw89';
 let transportMode='car';
 
 // v13.2 — live GPS navigation
@@ -176,10 +177,37 @@ async function geocodeDamkar(d){const cacheKey='sigap_geocode_'+d.id;try{const c
 }
 async function loadDamkar(){const note=document.getElementById('damkarNotice');try{const r=await fetch('./damkar_semarang.json', {cache:'no-store'});const arr=await r.json();let ok=0,failed=0;for(const d of arr){let lat=d.lat,lng=d.lng;if(lat==null||lng==null){try{const g=await geocodeDamkar(d);lat=g.lat;lng=g.lng;await sleep(1100)}catch(e){failed++;continue}}features.push(toFeature(d,lat,lng));ok++;}renderMarkers();note.textContent=`🔥 ${ok} pos Damkar aktif di peta${failed?`; ${failed} titik belum memiliki koordinat`:''}.`;note.classList.add('success')}catch(e){note.textContent='🔥 Data Damkar belum dapat dimuat; kategori lain tetap dapat digunakan.'}}
 
-Promise.all([
-  fetch('./fasilitas_semarang.geojson', {cache:'no-store'}).then(r=>r.json()).then(j=>{features=j.features}),
-  loadBoundary()
-]).then(()=>loadDamkar()).catch(()=>{list.innerHTML='<p>Data GeoJSON gagal dimuat. Jalankan melalui Live Server/GitHub Pages.</p>';loadDamkar()});
+(async()=>{
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/fasilitas?select=*`,{
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:`Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    if(!r.ok) throw new Error(`Supabase error: ${r.status}`);
+
+    const data=await r.json();
+
+    features=data
+      .filter(d=>d.latitude!=null && d.longitude!=null)
+      .map(d=>({
+        type:'Feature',
+        geometry:{
+          type:'Point',
+          coordinates:[Number(d.longitude),Number(d.latitude)]
+        },
+        properties:d
+      }));
+
+    await loadDamkar();
+  }catch(e){
+    console.error(e);
+    const list=document.getElementById('facilityList');
+    if(list) list.innerHTML='<p>Data fasilitas gagal dimuat dari Supabase.</p>';
+  }
+})();
 
 let cityCoverageLayers=[];
 
