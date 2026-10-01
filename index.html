@@ -161,6 +161,13 @@
     <span>⌕</span><input id="facilitySearch" type="search" placeholder="Cari nama fasilitas, alamat, atau kecamatan…"><button id="clearSearch" title="Hapus pencarian">×</button>
   </div>
   <div class="map-status"><span class="status-dot"></span><b>Kota Semarang</b><small id="mapStatusText">Memuat fasilitas…</small></div>
+  <aside id="mapNearestPanel" class="map-nearest-panel hidden" aria-label="Daftar fasilitas terdekat">
+    <div class="map-nearest-header">
+      <div><span class="eyebrow">FASILITAS TERDEKAT</span><h2 id="mapNearestTitle">Medis</h2><small id="mapNearestCount"></small></div>
+      <button id="closeMapNearest" type="button" title="Tutup daftar" aria-label="Tutup daftar">×</button>
+    </div>
+    <div id="mapNearestList" class="map-nearest-list"></div>
+  </aside>
   <div class="basemap-card"><button id="basemapBtn">▱ <span>Peta Terang</span>⌄</button><div id="basemapMenu" class="basemap-menu hidden"><button data-base="light" class="active">Peta Terang</button><button data-base="osm">OpenStreetMap</button></div></div>
   <div class="floating-legend">
     <div class="legend-title">Legenda</div>

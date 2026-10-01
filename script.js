@@ -44,14 +44,33 @@ function decodePolyline6(str){
   return coordinates;
 }
 
-const list=document.getElementById('nearestList'), colors={Medis:'#bf2d2d',Keamanan:'#46678f',Bencana:'#4f7d62',Kebakaran:'#d9822b'};
+const list=document.getElementById('nearestList'), mapNearestList=document.getElementById('mapNearestList'), colors={Medis:'#bf2d2d',Keamanan:'#46678f',Bencana:'#4f7d62',Kebakaran:'#d9822b'};
 let searchQuery='';
+let mapNearestOpen=false;
 function hav(a,b){const R=6371,toR=x=>x*Math.PI/180,dLat=toR(b.lat-a.lat),dLon=toR(b.lng-a.lng),q=Math.sin(dLat/2)**2+Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q));}
 function icon(cat){const symbol=cat==='Medis'?'✚':cat==='Keamanan'?'●':cat==='Kebakaran'?'🔥':'!';return L.divIcon({className:'',html:`<div style="width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${colors[cat]||'#c83e3e'};border:3px solid white;box-shadow:0 2px 8px #0004"><span style="display:block;transform:rotate(45deg);text-align:center;line-height:24px;color:white;font-size:12px">${symbol}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});}
 const filtered=()=>features.filter(f=>{const p=f.properties||{};const catOk=activeCat==='Semua'||p.kategori===activeCat;const hay=(p.nama+' '+(p.alamat||'')+' '+(p.kecamatan||'')+' '+(p.jenis||'')).toLowerCase();return catOk&&(!searchQuery||hay.includes(searchQuery));});
 function renderMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[];filtered().forEach(f=>{const [lng,lat]=f.geometry.coordinates,p=f.properties,m=L.marker([lat,lng],{icon:icon(p.kategori)}).addTo(map);const phone=p.telepon?`<br>☎ ${p.telepon}`:'';m.bindPopup(`<b>${p.nama}</b><br>${p.jenis}<br>${p.alamat||''}${phone}<br><button onclick="routeTo('${p.id}')">Lihat rute</button>`);markers.push(m)});renderNearest();const ms=document.getElementById('mapStatusText');if(ms)ms.textContent=`${filtered().length} fasilitas ditampilkan`;}
-function renderNearest(){const base=userLatLng||{lat:-7.0476,lng:110.4407};const arr=filtered().map(f=>{const [lng,lat]=f.geometry.coordinates;return{f,d:hav(base,{lat,lng})}}).sort((a,b)=>a.d-b.d).slice(0,5);list.innerHTML=arr.map(x=>{const p=x.f.properties;return `<div class="facility"><div class="row"><div><h4>${p.nama}</h4><p>${p.jenis}<br>${p.kecamatan||'Kota Semarang'}</p></div><span class="dist">${x.d.toFixed(1)} km</span></div><button onclick="focusFacility('${p.id}')">Lihat Detail / Rute</button></div>`}).join('');}
-window.focusFacility=id=>{const f=features.find(x=>x.properties.id===id);if(!f)return;const [lng,lat]=f.geometry.coordinates;map.setView([lat,lng],15);selected=f;markers.forEach(m=>{const ll=m.getLatLng();if(Math.abs(ll.lat-lat)<1e-6&&Math.abs(ll.lng-lng)<1e-6)m.openPopup()})};
+function renderNearest(){
+  const base=userLatLng||{lat:-7.0476,lng:110.4407};
+  const arr=filtered().map(f=>{const [lng,lat]=f.geometry.coordinates;return{f,d:hav(base,{lat,lng})}}).sort((a,b)=>a.d-b.d);
+  const card=(x)=>{const p=x.f.properties;return `<div class="facility"><div class="row"><div><h4>${p.nama}</h4><p>${p.jenis}<br>${p.kecamatan||p.alamat||'Kota Semarang'}</p></div><span class="dist">${x.d.toFixed(1)} km</span></div><button onclick="focusFacility('${p.id}')">Lihat Detail / Rute</button></div>`};
+  if(list)list.innerHTML=arr.slice(0,5).map(card).join('');
+
+  const panel=document.getElementById('mapNearestPanel');
+  if(!panel||!mapNearestList)return;
+  panel.classList.toggle('hidden',!mapNearestOpen||activeCat==='Semua');
+  document.getElementById('mapNearestTitle').textContent=activeCat;
+  document.getElementById('mapNearestCount').textContent=`${arr.length} fasilitas`;
+  mapNearestList.innerHTML=arr.map(x=>{
+    const p=x.f.properties;
+    return `<article class="map-nearest-item" data-facility-id="${p.id}" tabindex="0"><div class="map-nearest-item-copy"><strong>${p.nama}</strong><span>${p.jenis||p.kategori}</span><small>${p.kecamatan||p.alamat||'Kota Semarang'}</small></div><span class="map-nearest-distance">${x.d.toFixed(1)} km</span><button type="button" data-focus-facility="${p.id}">Lihat Detail / Rute</button></article>`;
+  }).join('')||'<p class="map-nearest-empty">Tidak ada fasilitas pada kategori ini.</p>';
+}
+window.focusFacility=id=>{const f=features.find(x=>x.properties.id===id);if(!f)return;const [lng,lat]=f.geometry.coordinates;map.flyTo([lat,lng],15,{duration:.8});selected=f;markers.forEach(m=>{const ll=m.getLatLng();if(Math.abs(ll.lat-lat)<1e-6&&Math.abs(ll.lng-lng)<1e-6)m.openPopup()})};
+document.getElementById('mapNearestList').addEventListener('click',e=>{const item=e.target.closest('.map-nearest-item');if(item)focusFacility(item.dataset.facilityId)});
+document.getElementById('mapNearestList').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.map-nearest-item')){e.preventDefault();focusFacility(e.target.dataset.facilityId)}});
+document.getElementById('closeMapNearest').addEventListener('click',()=>{mapNearestOpen=false;renderNearest()});
 window.routeTo=async (id,opts={})=>{
   const f=features.find(x=>x.properties.id===id); if(!f)return;
   selected=f;
@@ -159,7 +178,7 @@ function stopLiveNavigation(){
 document.getElementById('startLiveNav')?.addEventListener('click',startLiveNavigation);
 document.getElementById('stopLiveNav')?.addEventListener('click',stopLiveNavigation);
 
-document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCat=b.dataset.cat;renderMarkers()});
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCat=b.dataset.cat;mapNearestOpen=activeCat!=='Semua';renderMarkers()});
 function clearRoute(){if(liveNavActive)stopLiveNavigation();if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}if(isoLayer){map.removeLayer(isoLayer);isoLayer=null}document.getElementById('routeCard').classList.add('hidden')}
 document.getElementById('clearRoute').onclick=clearRoute;document.getElementById('closeRoute').onclick=clearRoute;
 
