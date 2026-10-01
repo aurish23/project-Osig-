@@ -50,7 +50,13 @@ let mapNearestOpen=false;
 function hav(a,b){const R=6371,toR=x=>x*Math.PI/180,dLat=toR(b.lat-a.lat),dLon=toR(b.lng-a.lng),q=Math.sin(dLat/2)**2+Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q));}
 function icon(cat){const symbol=cat==='Medis'?'✚':cat==='Keamanan'?'●':cat==='Kebakaran'?'🔥':'!';return L.divIcon({className:'',html:`<div style="width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${colors[cat]||'#c83e3e'};border:3px solid white;box-shadow:0 2px 8px #0004"><span style="display:block;transform:rotate(45deg);text-align:center;line-height:24px;color:white;font-size:12px">${symbol}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});}
 const filtered=()=>features.filter(f=>{const p=f.properties||{};const catOk=activeCat==='Semua'||p.kategori===activeCat;const hay=(p.nama+' '+(p.alamat||'')+' '+(p.kecamatan||'')+' '+(p.jenis||'')).toLowerCase();return catOk&&(!searchQuery||hay.includes(searchQuery));});
-function renderMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[];filtered().forEach(f=>{const [lng,lat]=f.geometry.coordinates,p=f.properties,m=L.marker([lat,lng],{icon:icon(p.kategori)}).addTo(map);const phone=p.telepon?`<br>☎ ${p.telepon}`:'';m.bindPopup(`<b>${p.nama}</b><br>${p.jenis}<br>${p.alamat||''}${phone}<br><button onclick="routeTo('${p.id}')">Lihat rute</button>`);markers.push(m)});renderNearest();const ms=document.getElementById('mapStatusText');if(ms)ms.textContent=`${filtered().length} fasilitas ditampilkan`;}
+function facilityPopupContent(f){
+  const p=f.properties||{},[lng,lat]=f.geometry.coordinates;
+  const distance=userLatLng?`Jarak dari lokasi saya: ${hav(userLatLng,{lat,lng}).toFixed(1).replace('.',',')} km`:'Lokasi Anda belum tersedia';
+  const phone=p.telepon?`<br>☎ ${p.telepon}`:'';
+  return `<b>${p.nama}</b><br>${p.jenis||p.kategori||''}<br>${p.alamat||''}${phone}<br>${distance}<br><button onclick="routeTo('${p.id}')">Lihat rute</button>`;
+}
+function renderMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[];filtered().forEach(f=>{const [lng,lat]=f.geometry.coordinates,p=f.properties,m=L.marker([lat,lng],{icon:icon(p.kategori)}).addTo(map);m.facilityFeature=f;m.bindPopup(()=>facilityPopupContent(f));markers.push(m)});renderNearest();const ms=document.getElementById('mapStatusText');if(ms)ms.textContent=`${filtered().length} fasilitas ditampilkan`;}
 function renderNearest(){
   const base=userLatLng||{lat:-7.0476,lng:110.4407};
   const arr=filtered().map(f=>{const [lng,lat]=f.geometry.coordinates;return{f,d:hav(base,{lat,lng})}}).sort((a,b)=>a.d-b.d);
@@ -117,6 +123,7 @@ function setUser(lat,lng,label='Lokasi Anda',opts={}){
     userMarker=L.circleMarker([lat,lng],{radius:8,color:'#172033',fillColor:'#fff',fillOpacity:1,weight:4}).addTo(map).bindTooltip(label);
   }
   if(!opts.keepView)map.setView([lat,lng],14);
+  markers.forEach(m=>{if(m.isPopupOpen())m.setPopupContent(facilityPopupContent(m.facilityFeature))});
   renderNearest();
 }
 function setDemoLocation(){setUser(-7.0476,110.4407,'Lokasi demo Tembalang')}
